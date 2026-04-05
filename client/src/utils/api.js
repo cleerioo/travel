@@ -36,3 +36,13 @@ export async function submitRating(score) {
   if (!response.ok) throw new Error('Failed to submit rating');
   return response.json();
 }
+
+export async function sendChatMessage(history, message) {
+  const response = await fetch(`${API_BASE}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ history, message }),
+  });
+  if (!response.ok) throw new Error('Failed to send message');
+  return response.json();
+}

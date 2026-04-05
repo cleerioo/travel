@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import PlannerPage from './pages/PlannerPage';
+import ChatBot from './components/ChatBot';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/planner" element={<PlannerPage />} />
       </Routes>
+      <ChatBot />
     </BrowserRouter>
   );
 }

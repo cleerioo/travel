@@ -70,4 +70,21 @@ router.get('/destination-image/:query', async (req, res) => {
   }
 });
 
+// Chat functionality
+const { chatWithAI } = require('../services/gemini');
+
+router.post('/chat', async (req, res) => {
+  try {
+    const { history, message } = req.body;
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+    const response = await chatWithAI(history || [], message);
+    res.json(response);
+  } catch (error) {
+    console.error('Chat route error:', error);
+    res.status(500).json({ error: 'Failed to process chat' });
+  }
+});
+
 module.exports = router;

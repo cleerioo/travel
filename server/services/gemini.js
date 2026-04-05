@@ -214,4 +214,40 @@ function getDemoItinerary(tripDetails) {
   return demoDestinations.default;
 }
 
-module.exports = { generateItinerary };
+const { CHATBOT_SYSTEM_PROMPT } = require('../utils/prompts');
+
+async function chatWithAI(history, newMessage) {
+  const client = getClient();
+  
+  if (!client) {
+    // Demo Mode Chat
+    return {
+      text: "Hello! I am TravelBot. Since the app is currently running in Demo Mode, my live AI brain is paused. Please add a Gemini API key to the Render dashboard to chat with me live!"
+    };
+  }
+
+  try {
+    const model = client.getGenerativeModel({ 
+      model: 'gemini-2.5-flash-preview-04-17',
+      systemInstruction: CHATBOT_SYSTEM_PROMPT
+    });
+
+    const chat = model.startChat({
+      history: history.map(msg => ({
+        role: msg.role === 'ai' ? 'model' : 'user',
+        parts: [{ text: msg.text }]
+      }))
+    });
+
+    const result = await chat.sendMessage(newMessage);
+    const response = await result.response;
+    return { text: response.text() };
+  } catch (error) {
+    console.error('Chat error:', error);
+    return {
+      text: "I'm sorry, I'm having trouble connecting to my servers right now. Please try again in a moment."
+    };
+  }
+}
+
+module.exports = { generateItinerary, chatWithAI };
