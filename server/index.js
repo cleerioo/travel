@@ -41,6 +41,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api', itineraryRoutes);
+app.use('/api', statsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
