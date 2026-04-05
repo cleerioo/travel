@@ -39,6 +39,28 @@ async function generateItinerary(tripDetails) {
   }
 }
 
+function getCurrencyInfo(destination) {
+  const dest = destination.toLowerCase();
+  if (dest.includes('india') || dest.includes('delhi') || dest.includes('mumbai') || dest.includes('jaipur')) {
+    return { symbol: '₹', mult: 85 };
+  } else if (dest.includes('japan') || dest.includes('tokyo') || dest.includes('kyoto') || dest.includes('osaka')) {
+    return { symbol: '¥', mult: 150 };
+  } else if (dest.includes('china') || dest.includes('beijing') || dest.includes('shanghai')) {
+    return { symbol: '¥', mult: 7 };
+  } else if (dest.includes('uk') || dest.includes('london') || dest.includes('england')) {
+    return { symbol: '£', mult: 0.8 };
+  } else if (dest.includes('europe') || dest.includes('paris') || dest.includes('france') || dest.includes('italy') || dest.includes('spain') || dest.includes('germany') || dest.includes('rome') || dest.includes('barcelona')) {
+    return { symbol: '€', mult: 0.9 };
+  } else if (dest.includes('dubai') || dest.includes('uae')) {
+    return { symbol: 'AED ', mult: 3.67 };
+  } else if (dest.includes('thailand') || dest.includes('bangkok')) {
+    return { symbol: '฿', mult: 36 };
+  } else if (dest.includes('indonesia') || dest.includes('bali')) {
+    return { symbol: 'Rp', mult: 16000 };
+  }
+  return { symbol: '$', mult: 1 };
+}
+
 function getDemoItinerary(tripDetails) {
   const { destination, startDate, endDate, budget, interests } = tripDetails;
   const start = new Date(startDate);
@@ -46,6 +68,15 @@ function getDemoItinerary(tripDetails) {
   const days = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1);
 
   const dest = destination || 'Tokyo, Japan';
+  
+  const curInfo = getCurrencyInfo(dest);
+  const sym = curInfo.symbol;
+  const m = curInfo.mult;
+
+  function fmt(val) {
+    const total = Math.round(val * m);
+    return `${sym}${total.toLocaleString()}`;
+  }
 
   // Generate demo data based on destination
   const demoDestinations = {
@@ -83,7 +114,7 @@ function getDemoItinerary(tripDetails) {
               description: `Start your day with a delicious breakfast at a popular local café. Try the regional specialties and fuel up for a day of exploration in ${dest}.`,
               category: 'food',
               duration: '1 hour',
-              estimatedCost: budget === 'luxury' ? '$35' : budget === 'mid-range' ? '$15' : '$8',
+              estimatedCost: budget === 'luxury' ? fmt(35) : budget === 'mid-range' ? fmt(15) : fmt(8),
               location: 'City Center'
             },
             {
@@ -92,7 +123,7 @@ function getDemoItinerary(tripDetails) {
               description: `Explore the historic heart of ${dest}. Wander through centuries-old streets, admire stunning architecture, and learn about the rich history that shaped this incredible destination.`,
               category: 'culture',
               duration: '2.5 hours',
-              estimatedCost: budget === 'luxury' ? '$45' : budget === 'mid-range' ? '$20' : '$10',
+              estimatedCost: budget === 'luxury' ? fmt(45) : budget === 'mid-range' ? fmt(20) : fmt(10),
               location: 'Old Town District'
             },
             {
@@ -101,7 +132,7 @@ function getDemoItinerary(tripDetails) {
               description: `Enjoy a sit-down lunch at a highly-rated local restaurant. Sample traditional dishes prepared with fresh, locally-sourced ingredients. Don't miss the house specialties!`,
               category: 'food',
               duration: '1.5 hours',
-              estimatedCost: budget === 'luxury' ? '$55' : budget === 'mid-range' ? '$25' : '$12',
+              estimatedCost: budget === 'luxury' ? fmt(55) : budget === 'mid-range' ? fmt(25) : fmt(12),
               location: 'Food District'
             },
             {
@@ -112,7 +143,7 @@ function getDemoItinerary(tripDetails) {
                 : `Take a refreshing walk through one of ${dest}'s beautiful parks. Enjoy the lush greenery, scenic viewpoints, and maybe catch a street performance.`,
               category: i % 2 === 0 ? 'culture' : 'nature',
               duration: '2 hours',
-              estimatedCost: budget === 'luxury' ? '$30' : budget === 'mid-range' ? '$15' : '$5',
+              estimatedCost: budget === 'luxury' ? fmt(30) : budget === 'mid-range' ? fmt(15) : fmt(5),
               location: i % 2 === 0 ? 'Cultural Quarter' : 'Central Park Area'
             },
             {
@@ -121,7 +152,7 @@ function getDemoItinerary(tripDetails) {
               description: `Head to the best sunset viewpoint in ${dest} for breathtaking panoramic views. As the city lights begin to twinkle, take an evening stroll through the vibrant streets.`,
               category: 'nature',
               duration: '1.5 hours',
-              estimatedCost: '$0',
+              estimatedCost: fmt(0),
               location: 'Observation Point'
             },
             {
@@ -130,7 +161,7 @@ function getDemoItinerary(tripDetails) {
               description: `Cap off the day with an incredible dinner at a renowned restaurant, followed by local evening entertainment. Experience the nightlife that makes ${dest} truly special.`,
               category: 'food',
               duration: '2.5 hours',
-              estimatedCost: budget === 'luxury' ? '$85' : budget === 'mid-range' ? '$40' : '$18',
+              estimatedCost: budget === 'luxury' ? fmt(85) : budget === 'mid-range' ? fmt(40) : fmt(18),
               location: 'Entertainment District'
             }
           ]
@@ -167,15 +198,15 @@ function getDemoItinerary(tripDetails) {
         bestTimeToVisit: 'Spring (March-May) and Autumn (September-November) typically offer the most pleasant weather with fewer crowds and better hotel rates.'
       },
       estimatedTotalCost: {
-        accommodation: budget === 'luxury' ? '$200 - $500/night' : budget === 'mid-range' ? '$80 - $180/night' : '$30 - $70/night',
-        food: budget === 'luxury' ? '$100 - $200/day' : budget === 'mid-range' ? '$40 - $80/day' : '$15 - $35/day',
-        activities: budget === 'luxury' ? '$80 - $150/day' : budget === 'mid-range' ? '$30 - $60/day' : '$10 - $25/day',
-        transport: budget === 'luxury' ? '$50 - $100/day' : budget === 'mid-range' ? '$15 - $30/day' : '$5 - $15/day',
+        accommodation: budget === 'luxury' ? `${fmt(200)} - ${fmt(500)}/night` : budget === 'mid-range' ? `${fmt(80)} - ${fmt(180)}/night` : `${fmt(30)} - ${fmt(70)}/night`,
+        food: budget === 'luxury' ? `${fmt(100)} - ${fmt(200)}/day` : budget === 'mid-range' ? `${fmt(40)} - ${fmt(80)}/day` : `${fmt(15)} - ${fmt(35)}/day`,
+        activities: budget === 'luxury' ? `${fmt(80)} - ${fmt(150)}/day` : budget === 'mid-range' ? `${fmt(30)} - ${fmt(60)}/day` : `${fmt(10)} - ${fmt(25)}/day`,
+        transport: budget === 'luxury' ? `${fmt(50)} - ${fmt(100)}/day` : budget === 'mid-range' ? `${fmt(15)} - ${fmt(30)}/day` : `${fmt(5)} - ${fmt(15)}/day`,
         total: budget === 'luxury'
-          ? `$${days * 430} - $${days * 950}`
+          ? `${fmt(days * 430)} - ${fmt(days * 950)}`
           : budget === 'mid-range'
-            ? `$${days * 165} - $${days * 350}`
-            : `$${days * 60} - $${days * 145}`
+            ? `${fmt(days * 165)} - ${fmt(days * 350)}`
+            : `${fmt(days * 60)} - ${fmt(days * 145)}`
       }
     }
   };
