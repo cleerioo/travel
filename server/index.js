@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const itineraryRoutes = require('./routes/itinerary');
+const statsRoutes = require('./routes/stats');
 
 dotenv.config();
 

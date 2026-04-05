@@ -20,3 +20,19 @@ export async function getDestinationImage(query) {
   if (!response.ok) return { url: '', source: 'none' };
   return response.json();
 }
+
+export async function fetchStats() {
+  const response = await fetch(`${API_BASE}/stats`);
+  if (!response.ok) throw new Error('Failed to fetch stats');
+  return response.json();
+}
+
+export async function submitRating(score) {
+  const response = await fetch(`${API_BASE}/rate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ score }),
+  });
+  if (!response.ok) throw new Error('Failed to submit rating');
+  return response.json();
+}

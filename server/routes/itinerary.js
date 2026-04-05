@@ -39,6 +39,10 @@ router.post('/generate-itinerary', async (req, res) => {
       travelers: travelers || 1
     });
 
+    // Increment global live DB counter
+    const { incrementTrips } = require('../utils/db');
+    incrementTrips();
+
     // Get destination image
     const image = await getDestinationImage(destination);
 

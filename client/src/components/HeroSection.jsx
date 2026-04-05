@@ -1,4 +1,29 @@
+import { useState, useEffect } from 'react';
+import { fetchStats } from '../utils/api';
+
 export default function HeroSection() {
+  const [stats, setStats] = useState({ trips: 10243, rating: 4.9 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const data = await fetchStats();
+        setStats(data);
+      } catch (err) {
+        console.error('Failed to load stats', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadStats();
+  }, []);
+
+  const formatNumber = (num) => {
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+    return num;
+  };
+
   return (
     <section className="hero" id="hero">
       <div className="hero-bg-effects">
@@ -48,11 +73,15 @@ export default function HeroSection() {
             <div className="hero-stat-label">Destinations</div>
           </div>
           <div className="hero-stat">
-            <div className="hero-stat-value">10K+</div>
+            <div className="hero-stat-value" style={{ opacity: loading ? 0.5 : 1 }}>
+              {formatNumber(stats.trips)}
+            </div>
             <div className="hero-stat-label">Trips Planned</div>
           </div>
           <div className="hero-stat">
-            <div className="hero-stat-value">4.9★</div>
+            <div className="hero-stat-value" style={{ opacity: loading ? 0.5 : 1 }}>
+              {stats.rating.toFixed(1)}★
+            </div>
             <div className="hero-stat-label">User Rating</div>
           </div>
           <div className="hero-stat">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import DayCard from './DayCard';
 import TravelTips from './TravelTips';
+import { submitRating } from '../utils/api';
 
 const CATEGORY_ICONS = {
   culture: '🏛️',
@@ -15,6 +16,8 @@ const CATEGORY_ICONS = {
 
 export default function ItineraryView({ data, image, mode, onNewTrip }) {
   const { itinerary } = data;
+  const [ratingHover, setRatingHover] = useState(0);
+  const [hasRated, setHasRated] = useState(false);
 
   return (
     <section className="itinerary-section">
@@ -99,6 +102,39 @@ export default function ItineraryView({ data, image, mode, onNewTrip }) {
         {itinerary.travelTips && (
           <TravelTips tips={itinerary.travelTips} />
         )}
+
+        {/* Rating Section */}
+        <div style={{ marginTop: '48px', padding: '32px', background: 'var(--gradient-card)', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
+          <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '16px' }}>
+            {hasRated ? 'Thank you for your feedback! 💖' : 'How would you rate this itinerary?'}
+          </h3>
+          {!hasRated && (
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', fontSize: '2rem', cursor: 'pointer' }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  onClick={async () => {
+                    setRatingHover(star);
+                    setHasRated(true);
+                    try {
+                      await submitRating(star);
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                  onMouseEnter={() => setRatingHover(star)}
+                  onMouseLeave={() => setRatingHover(0)}
+                  style={{
+                    color: star <= ratingHover ? '#f59e0b' : 'var(--text-muted)',
+                    transition: 'var(--transition-fast)'
+                  }}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Action Buttons */}
         <div className="actions-bar">
