@@ -223,15 +223,58 @@ export default function TripForm({ onSubmit, isLoading }) {
             {/* Number of Travelers */}
             <div className="form-group full-width">
               <label className="form-label">👥 Number of Travelers</label>
-              <input
-                id="travelers-input"
-                type="number"
-                className="form-input"
-                min="1"
-                max="20"
-                value={formData.travelers}
-                onChange={(e) => handleChange('travelers', parseInt(e.target.value) || 1)}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <button
+                  type="button"
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-medium)',
+                    background: 'var(--bg-glass)',
+                    color: 'var(--text-primary)',
+                    fontSize: '1.2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: formData.travelers <= 1 ? 'not-allowed' : 'pointer',
+                    opacity: formData.travelers <= 1 ? 0.5 : 1
+                  }}
+                  onClick={() => handleChange('travelers', Math.max(1, formData.travelers - 1))}
+                  disabled={formData.travelers <= 1}
+                >
+                  −
+                </button>
+                <input
+                  id="travelers-input"
+                  type="text"
+                  readOnly
+                  className="form-input"
+                  value={`${formData.travelers} ${formData.travelers === 1 ? 'Person' : 'People'}`}
+                  style={{ textAlign: 'center', flex: 1 }}
+                />
+                <button
+                  type="button"
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-medium)',
+                    background: 'var(--bg-glass)',
+                    color: 'var(--text-primary)',
+                    fontSize: '1.2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: formData.travelers >= 20 ? 'not-allowed' : 'pointer',
+                    opacity: formData.travelers >= 20 ? 0.5 : 1
+                  }}
+                  onClick={() => handleChange('travelers', Math.min(20, formData.travelers + 1))}
+                  disabled={formData.travelers >= 20}
+                >
+                  +
+                </button>
+              </div>
             </div>
 
             {/* Interests */}
