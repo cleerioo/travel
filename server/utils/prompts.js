@@ -17,7 +17,7 @@ REQUIREMENTS:
 1. Create a day-by-day itinerary for the entire trip duration
 2. Each day should have 3-5 activities with specific times
 3. Include a mix of activities matching the traveler's interests
-4. Provide realistic estimated costs in USD
+4. Provide realistic estimated costs in the LOCAL CURRENCY of the destination (e.g., ₹ for India, ¥ for Japan/China, € for Europe). Do NOT use USD unless the destination uses USD.
 5. Include specific location names and neighborhoods
 6. Add practical travel tips specific to this destination
 7. Consider travel time between locations

@@ -198,9 +198,9 @@ export default function TripForm({ onSubmit, isLoading }) {
                 value={formData.budget}
                 onChange={(e) => handleChange('budget', e.target.value)}
               >
-                <option value="budget">🎒 Budget ($50-100/day)</option>
-                <option value="mid-range">🏨 Mid-Range ($100-250/day)</option>
-                <option value="luxury">💎 Luxury ($250+/day)</option>
+                <option value="budget">🎒 Budget</option>
+                <option value="mid-range">🏨 Mid-Range</option>
+                <option value="luxury">💎 Luxury</option>
               </select>
             </div>
 
