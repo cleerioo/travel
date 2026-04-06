@@ -20,7 +20,7 @@ async function generateItinerary(tripDetails) {
   }
 
   try {
-    const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = client.getGenerativeModel({ model: 'gemini-1.5-flash' });
     const prompt = buildItineraryPrompt(tripDetails);
 
     const result = await model.generateContent(prompt);
@@ -228,7 +228,7 @@ async function chatWithAI(history, newMessage) {
 
   try {
     const model = client.getGenerativeModel({ 
-      model: 'gemini-2.0-flash',
+      model: 'gemini-1.5-flash',
       systemInstruction: CHATBOT_SYSTEM_PROMPT
     });
 
@@ -245,7 +245,7 @@ async function chatWithAI(history, newMessage) {
   } catch (error) {
     console.error('Chat error:', error);
     return {
-      text: "I'm sorry, I'm having trouble connecting to my servers right now. Please try again in a moment."
+      text: "Error connecting to AI Model: " + error.message
     };
   }
 }
