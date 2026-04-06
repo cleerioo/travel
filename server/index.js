@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const itineraryRoutes = require('./routes/itinerary');
 const statsRoutes = require('./routes/stats');
+const chatRoutes = require('./routes/chat');
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api', itineraryRoutes);
 app.use('/api', statsRoutes);
+app.use('/api', chatRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
