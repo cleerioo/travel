@@ -232,11 +232,19 @@ async function chatWithAI(history, newMessage) {
       systemInstruction: CHATBOT_SYSTEM_PROMPT
     });
 
+    // Gemini API strict rule: The conversation history MUST start with a 'user' message.
+    let validHistory = history.map(msg => ({
+      role: msg.role === 'ai' ? 'model' : 'user',
+      parts: [{ text: msg.text }]
+    }));
+
+    // Remove any leading 'model' messages (like the initial greeting)
+    while (validHistory.length > 0 && validHistory[0].role !== 'user') {
+      validHistory.shift();
+    }
+
     const chat = model.startChat({
-      history: history.map(msg => ({
-        role: msg.role === 'ai' ? 'model' : 'user',
-        parts: [{ text: msg.text }]
-      }))
+      history: validHistory
     });
 
     const result = await chat.sendMessage(newMessage);
