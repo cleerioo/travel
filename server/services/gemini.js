@@ -20,7 +20,7 @@ async function generateItinerary(tripDetails) {
   }
 
   try {
-    const model = client.getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17' });
+    const model = client.getGenerativeModel({ model: 'gemini-2.0-flash' });
     const prompt = buildItineraryPrompt(tripDetails);
 
     const result = await model.generateContent(prompt);
@@ -228,7 +228,7 @@ async function chatWithAI(history, newMessage) {
 
   try {
     const model = client.getGenerativeModel({ 
-      model: 'gemini-2.5-flash-preview-04-17',
+      model: 'gemini-2.0-flash',
       systemInstruction: CHATBOT_SYSTEM_PROMPT
     });
 
