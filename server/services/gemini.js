@@ -12,47 +12,42 @@ function getClient() {
 }
 
 async function generateItinerary(tripDetails) {
-  const client = getClient();
-
-  if (!client) {
-    // Return demo data
+  if (!process.env.GEMINI_API_KEY) {
     return getDemoItinerary(tripDetails);
   }
 
-  // Try different model aliases if one returns 404 Not Found
-  const modelsToTry = [
-    'gemini-1.5-flash-latest',
-    'gemini-1.5-flash',
-    'gemini-1.5-pro',
-    'gemini-pro'
-  ];
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const prompt = buildItineraryPrompt(tripDetails);
 
-  for (const modelAlias of modelsToTry) {
-    try {
-      const model = client.getGenerativeModel({ model: modelAlias });
-      const prompt = buildItineraryPrompt(tripDetails);
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: "user", parts: [{ text: prompt }] }]
+      })
+    });
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      let text = response.text();
+    const data = await response.json();
 
+    if (!response.ok) {
+      console.error('Gemini API Error Response:', data);
+      return getDemoItinerary(tripDetails);
+    }
+
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      let text = data.candidates[0].content.parts[0].text;
       // Clean up response - remove markdown code blocks if present
       text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-
       const itinerary = JSON.parse(text);
       return itinerary;
-    } catch (error) {
-      if (error.message && error.message.includes('not found')) {
-        console.warn(`Model ${modelAlias} failed (not found), trying next...`);
-        continue;
-      }
-      console.error(`Gemini API error with ${modelAlias}:`, error.message);
-      break; // Stop and fallback to demo data if it's a structural error
+    } else {
+      return getDemoItinerary(tripDetails);
     }
+  } catch (error) {
+    console.error('Gemini API fetch error:', error);
+    return getDemoItinerary(tripDetails);
   }
-
-  // Fallback to demo data on error or if all models fail
-  return getDemoItinerary(tripDetails);
 }
 
 function getCurrencyInfo(destination) {
@@ -233,12 +228,8 @@ function getDemoItinerary(tripDetails) {
 const { CHATBOT_SYSTEM_PROMPT } = require('../utils/prompts');
 
 async function chatWithAI(history, newMessage) {
-  const client = getClient();
-  
-  if (!client) {
-    return {
-      text: "Hello! I am TravelBot. Since the app is currently running in Demo Mode, my live AI brain is paused. Please add a Gemini API key to the Render dashboard to chat with me live!"
-    };
+  if (!process.env.GEMINI_API_KEY) {
+    return { text: "Hello! I am TravelBot. Since the app is currently running in Demo Mode, my live AI brain is paused. Please add a Gemini API key to chat with me live!" };
   }
 
   // Gemini API strict rule: The conversation history MUST start with a 'user' message.
@@ -247,48 +238,47 @@ async function chatWithAI(history, newMessage) {
     parts: [{ text: msg.text }]
   }));
 
-  // Remove any leading 'model' messages (like the initial greeting)
   while (validHistory.length > 0 && validHistory[0].role !== 'user') {
     validHistory.shift();
   }
 
-  // Try different model aliases if one returns 404 Not Found
-  const modelsToTry = [
-    'gemini-1.5-flash-latest',
-    'gemini-1.5-flash',
-    'gemini-1.5-pro',
-    'gemini-pro'
-  ];
+  // Add the new message
+  validHistory.push({
+    role: 'user',
+    parts: [{ text: newMessage }]
+  });
 
-  let lastError = null;
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: validHistory,
+        systemInstruction: {
+          role: "user",
+          parts: [{ text: CHATBOT_SYSTEM_PROMPT }]
+        }
+      })
+    });
 
-  for (const modelAlias of modelsToTry) {
-    try {
-      const model = client.getGenerativeModel({ 
-        model: modelAlias,
-        systemInstruction: CHATBOT_SYSTEM_PROMPT
-      });
+    const data = await response.json();
 
-      const chat = model.startChat({ history: validHistory });
-      const result = await chat.sendMessage(newMessage);
-      const response = await result.response;
-      return { text: response.text() };
-    } catch (error) {
-      lastError = error;
-      // If the error is a 404 Not Found, try the next model.
-      if (error.message && error.message.includes('not found')) {
-        console.warn(`Model ${modelAlias} failed (not found), trying next...`);
-        continue;
-      }
-      // If it's a different error, stop immediately rather than trying other models
-      break;
+    if (!response.ok) {
+      console.error('Gemini API Error Response:', data);
+      return { text: `API Error: ${data.error?.message || response.statusText}` };
     }
-  }
 
-  console.error('All chat models failed or encountered a fatal error:', lastError);
-  return {
-    text: "Error connecting to AI Model: " + (lastError ? lastError.message : 'Unknown error. Check API key permissions.')
-  };
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      return { text: data.candidates[0].content.parts[0].text };
+    } else {
+      return { text: "Sorry, I received an empty response from the AI." };
+    }
+  } catch (error) {
+    console.error('Chat error:', error);
+    return { text: "Error connecting to AI Model: " + error.message };
+  }
 }
 
 module.exports = { generateItinerary, chatWithAI };
