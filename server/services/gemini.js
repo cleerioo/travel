@@ -256,7 +256,7 @@ async function chatWithAI(history, newMessage) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: validHistory,
-        systemInstruction: {
+        system_instruction: {
           role: "user",
           parts: [{ text: CHATBOT_SYSTEM_PROMPT }]
         }
