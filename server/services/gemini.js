@@ -253,7 +253,7 @@ async function chatWithAI(history, newMessage) {
     validHistory[0].parts[0].text = CHATBOT_SYSTEM_PROMPT + "\n\n" + validHistory[0].parts[0].text;
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
   
   try {
     const response = await fetch(url, {
@@ -267,7 +267,17 @@ async function chatWithAI(history, newMessage) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Gemini API Error Response:', data);
+      if (response.status === 404) {
+        // Fetch available models to debug the key
+        try {
+           const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
+           const modelsData = await modelsRes.json();
+           const names = modelsData.models ? modelsData.models.map(m => m.name).join(', ') : 'No models found at all';
+           return { text: `API Error (404). But I checked your API key, and these are the only models you have access to: ${names}` };
+        } catch(e) {
+           return { text: `API Error: ${data.error?.message || response.statusText}. Could not list models.` };
+        }
+      }
       return { text: `API Error: ${data.error?.message || response.statusText}` };
     }
 
