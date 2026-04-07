@@ -248,6 +248,11 @@ async function chatWithAI(history, newMessage) {
     parts: [{ text: newMessage }]
   });
 
+  // Inject the system prompt into the very first message silently to completely avoid REST API field incompatibilities
+  if (validHistory.length > 0 && !validHistory[0].parts[0].text.includes("TravelBot, an energetic")) {
+    validHistory[0].parts[0].text = CHATBOT_SYSTEM_PROMPT + "\n\n" + validHistory[0].parts[0].text;
+  }
+
   const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
   
   try {
@@ -255,11 +260,7 @@ async function chatWithAI(history, newMessage) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: validHistory,
-        system_instruction: {
-          role: "user",
-          parts: [{ text: CHATBOT_SYSTEM_PROMPT }]
-        }
+        contents: validHistory
       })
     });
 
