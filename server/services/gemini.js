@@ -19,24 +19,40 @@ async function generateItinerary(tripDetails) {
     return getDemoItinerary(tripDetails);
   }
 
-  try {
-    const model = client.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const prompt = buildItineraryPrompt(tripDetails);
+  // Try different model aliases if one returns 404 Not Found
+  const modelsToTry = [
+    'gemini-1.5-flash-latest',
+    'gemini-1.5-flash',
+    'gemini-1.5-pro',
+    'gemini-pro'
+  ];
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
+  for (const modelAlias of modelsToTry) {
+    try {
+      const model = client.getGenerativeModel({ model: modelAlias });
+      const prompt = buildItineraryPrompt(tripDetails);
 
-    // Clean up response - remove markdown code blocks if present
-    text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      let text = response.text();
 
-    const itinerary = JSON.parse(text);
-    return itinerary;
-  } catch (error) {
-    console.error('Gemini API error:', error.message);
-    // Fallback to demo data on error
-    return getDemoItinerary(tripDetails);
+      // Clean up response - remove markdown code blocks if present
+      text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+
+      const itinerary = JSON.parse(text);
+      return itinerary;
+    } catch (error) {
+      if (error.message && error.message.includes('not found')) {
+        console.warn(`Model ${modelAlias} failed (not found), trying next...`);
+        continue;
+      }
+      console.error(`Gemini API error with ${modelAlias}:`, error.message);
+      break; // Stop and fallback to demo data if it's a structural error
+    }
   }
+
+  // Fallback to demo data on error or if all models fail
+  return getDemoItinerary(tripDetails);
 }
 
 function getCurrencyInfo(destination) {
@@ -220,42 +236,59 @@ async function chatWithAI(history, newMessage) {
   const client = getClient();
   
   if (!client) {
-    // Demo Mode Chat
     return {
       text: "Hello! I am TravelBot. Since the app is currently running in Demo Mode, my live AI brain is paused. Please add a Gemini API key to the Render dashboard to chat with me live!"
     };
   }
 
-  try {
-    const model = client.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
-      systemInstruction: CHATBOT_SYSTEM_PROMPT
-    });
+  // Gemini API strict rule: The conversation history MUST start with a 'user' message.
+  let validHistory = history.map(msg => ({
+    role: msg.role === 'ai' ? 'model' : 'user',
+    parts: [{ text: msg.text }]
+  }));
 
-    // Gemini API strict rule: The conversation history MUST start with a 'user' message.
-    let validHistory = history.map(msg => ({
-      role: msg.role === 'ai' ? 'model' : 'user',
-      parts: [{ text: msg.text }]
-    }));
-
-    // Remove any leading 'model' messages (like the initial greeting)
-    while (validHistory.length > 0 && validHistory[0].role !== 'user') {
-      validHistory.shift();
-    }
-
-    const chat = model.startChat({
-      history: validHistory
-    });
-
-    const result = await chat.sendMessage(newMessage);
-    const response = await result.response;
-    return { text: response.text() };
-  } catch (error) {
-    console.error('Chat error:', error);
-    return {
-      text: "Error connecting to AI Model: " + error.message
-    };
+  // Remove any leading 'model' messages (like the initial greeting)
+  while (validHistory.length > 0 && validHistory[0].role !== 'user') {
+    validHistory.shift();
   }
+
+  // Try different model aliases if one returns 404 Not Found
+  const modelsToTry = [
+    'gemini-1.5-flash-latest',
+    'gemini-1.5-flash',
+    'gemini-1.5-pro',
+    'gemini-pro'
+  ];
+
+  let lastError = null;
+
+  for (const modelAlias of modelsToTry) {
+    try {
+      const model = client.getGenerativeModel({ 
+        model: modelAlias,
+        systemInstruction: CHATBOT_SYSTEM_PROMPT
+      });
+
+      const chat = model.startChat({ history: validHistory });
+      const result = await chat.sendMessage(newMessage);
+      const response = await result.response;
+      return { text: response.text() };
+    } catch (error) {
+      lastError = error;
+      // If the error is a 404 Not Found, try the next model.
+      if (error.message && error.message.includes('not found')) {
+        console.warn(`Model ${modelAlias} failed (not found), trying next...`);
+        continue;
+      }
+      // If it's a different error, stop immediately rather than trying other models
+      break;
+    }
+  }
+
+  console.error('All chat models failed or encountered a fatal error:', lastError);
+  return {
+    text: "Error connecting to AI Model: " + (lastError ? lastError.message : 'Unknown error. Check API key permissions.')
+  };
 }
 
 module.exports = { generateItinerary, chatWithAI };
