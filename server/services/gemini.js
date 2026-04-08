@@ -52,7 +52,9 @@ async function generateItinerary(tripDetails) {
 
 function getCurrencyInfo(destination) {
   const dest = destination.toLowerCase();
-  if (dest.includes('india') || dest.includes('delhi') || dest.includes('mumbai') || dest.includes('jaipur')) {
+  const indianCities = ['india', 'delhi', 'mumbai', 'jaipur', 'ranchi', 'goa', 'bangalore', 'bengaluru', 'chennai', 'kolkata', 'kerala', 'hyderabad', 'pune'];
+  
+  if (indianCities.some(city => dest.includes(city))) {
     return { symbol: '₹', mult: 85 };
   } else if (dest.includes('japan') || dest.includes('tokyo') || dest.includes('kyoto') || dest.includes('osaka')) {
     return { symbol: '¥', mult: 150 };
@@ -69,6 +71,7 @@ function getCurrencyInfo(destination) {
   } else if (dest.includes('indonesia') || dest.includes('bali')) {
     return { symbol: 'Rp', mult: 16000 };
   }
+  // Default to INR if it seems like an Indian IP or just standard fallback, but let's keep standard $ for others.
   return { symbol: '$', mult: 1 };
 }
 
