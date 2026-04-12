@@ -16,7 +16,7 @@ async function generateItinerary(tripDetails) {
     return getDemoItinerary(tripDetails);
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
   const prompt = buildItineraryPrompt(tripDetails);
 
   try {
@@ -336,7 +336,7 @@ async function chatWithAI(history, newMessage) {
     validHistory[0].parts[0].text = CHATBOT_SYSTEM_PROMPT + "\n\n" + validHistory[0].parts[0].text;
   }
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
   
   try {
     const response = await fetch(url, {
