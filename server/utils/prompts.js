@@ -8,7 +8,7 @@ function buildItineraryPrompt(tripDetails) {
 TRIP DETAILS:
 - Destination: ${destination}
 - Travel Dates: ${startDate} to ${endDate}
-- Budget Level: ${budget} (Budget = $50-100/day, Mid-Range = $100-250/day, Luxury = $250+/day)
+- Budget Level: ${budget} (Budget = low-cost/backpacker, Mid-Range = comfortable/moderate, Luxury = premium/high-end)
 - Interests: ${interestList}
 - Travel Style: ${travelStyle || 'Solo'}
 - Number of Travelers: ${travelers || 1}
@@ -17,7 +17,7 @@ REQUIREMENTS:
 1. Create a day-by-day itinerary for the entire trip duration
 2. Each day should have 3-5 activities with specific times
 3. Include a mix of activities matching the traveler's interests
-4. Provide realistic estimated costs in the LOCAL CURRENCY of the destination (e.g., ₹ for India, ¥ for Japan/China, € for Europe). Do NOT use USD unless the destination uses USD.
+4. Provide realistic estimated costs in the LOCAL CURRENCY of the destination. Use the correct currency symbol (e.g., ₹ for India, ¥ for Japan/China, € for Europe, £ for UK, ฿ for Thailand, etc.). NEVER use $ or USD unless the destination is in the United States. This is CRITICAL.
 5. Include specific location names and neighborhoods
 6. Add practical travel tips specific to this destination
 7. Consider travel time between locations
@@ -40,7 +40,7 @@ RESPOND WITH ONLY VALID JSON in this exact format (no markdown, no code blocks, 
           "description": "2-3 sentence description of the activity",
           "category": "culture|food|adventure|nature|shopping|nightlife|relaxation|transport",
           "duration": "X hours",
-          "estimatedCost": "$XX",
+          "estimatedCost": "<local_currency_symbol><amount>",
           "location": "Specific location/neighborhood"
         }
       ]
@@ -55,11 +55,11 @@ RESPOND WITH ONLY VALID JSON in this exact format (no markdown, no code blocks, 
     "bestTimeToVisit": "Description of best time to visit"
   },
   "estimatedTotalCost": {
-    "accommodation": "$XXX - $XXX",
-    "food": "$XXX - $XXX", 
-    "activities": "$XXX - $XXX",
-    "transport": "$XXX - $XXX",
-    "total": "$XXX - $XXX"
+    "accommodation": "<local_currency_symbol><amount> - <local_currency_symbol><amount>",
+    "food": "<local_currency_symbol><amount> - <local_currency_symbol><amount>", 
+    "activities": "<local_currency_symbol><amount> - <local_currency_symbol><amount>",
+    "transport": "<local_currency_symbol><amount> - <local_currency_symbol><amount>",
+    "total": "<local_currency_symbol><amount> - <local_currency_symbol><amount>"
   }
 }`;
 }

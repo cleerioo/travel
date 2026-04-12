@@ -52,27 +52,66 @@ async function generateItinerary(tripDetails) {
 
 function getCurrencyInfo(destination) {
   const dest = destination.toLowerCase();
-  const indianCities = ['india', 'delhi', 'mumbai', 'jaipur', 'ranchi', 'goa', 'bangalore', 'bengaluru', 'chennai', 'kolkata', 'kerala', 'hyderabad', 'pune'];
-  
-  if (indianCities.some(city => dest.includes(city))) {
+
+  // Comprehensive Indian cities/states/regions
+  const indianPlaces = [
+    'india', 'delhi', 'mumbai', 'jaipur', 'ranchi', 'goa', 'bangalore', 'bengaluru',
+    'chennai', 'kolkata', 'kerala', 'hyderabad', 'pune', 'varanasi', 'agra', 'lucknow',
+    'ahmedabad', 'surat', 'kanpur', 'nagpur', 'indore', 'bhopal', 'patna', 'vadodara',
+    'ludhiana', 'amritsar', 'chandigarh', 'jodhpur', 'udaipur', 'shimla', 'manali',
+    'darjeeling', 'mysore', 'mysuru', 'coimbatore', 'madurai', 'kochi', 'cochin',
+    'trivandrum', 'thiruvananthapuram', 'vizag', 'visakhapatnam', 'bhubaneswar',
+    'guwahati', 'shillong', 'gangtok', 'srinagar', 'leh', 'ladakh', 'rishikesh',
+    'haridwar', 'dehradun', 'mussoorie', 'nainital', 'jaisalmer', 'pushkar', 'mount abu',
+    'ooty', 'kodaikanal', 'pondicherry', 'puducherry', 'hampi', 'alleppey', 'munnar',
+    'wayanad', 'coorg', 'andaman', 'lakshadweep', 'kashmir', 'rajasthan', 'tamil nadu',
+    'karnataka', 'maharashtra', 'gujarat', 'punjab', 'haryana', 'uttarakhand',
+    'himachal', 'jharkhand', 'bihar', 'odisha', 'assam', 'meghalaya', 'sikkim',
+    'nagaland', 'manipur', 'tripura', 'mizoram', 'arunachal', 'chhattisgarh',
+    'madhya pradesh', 'uttar pradesh', 'west bengal', 'andhra pradesh', 'telangana'
+  ];
+
+  if (indianPlaces.some(place => dest.includes(place))) {
     return { symbol: '₹', mult: 85 };
-  } else if (dest.includes('japan') || dest.includes('tokyo') || dest.includes('kyoto') || dest.includes('osaka')) {
+  } else if (dest.includes('japan') || dest.includes('tokyo') || dest.includes('kyoto') || dest.includes('osaka') || dest.includes('hiroshima') || dest.includes('nara') || dest.includes('sapporo') || dest.includes('fukuoka')) {
     return { symbol: '¥', mult: 150 };
-  } else if (dest.includes('china') || dest.includes('beijing') || dest.includes('shanghai')) {
+  } else if (dest.includes('china') || dest.includes('beijing') || dest.includes('shanghai') || dest.includes('guangzhou') || dest.includes('shenzhen') || dest.includes('chengdu') || dest.includes('hangzhou')) {
     return { symbol: '¥', mult: 7 };
-  } else if (dest.includes('uk') || dest.includes('london') || dest.includes('england')) {
+  } else if (dest.includes('uk') || dest.includes('london') || dest.includes('england') || dest.includes('scotland') || dest.includes('edinburgh') || dest.includes('manchester') || dest.includes('wales') || dest.includes('britain')) {
     return { symbol: '£', mult: 0.8 };
-  } else if (dest.includes('europe') || dest.includes('paris') || dest.includes('france') || dest.includes('italy') || dest.includes('spain') || dest.includes('germany') || dest.includes('rome') || dest.includes('barcelona')) {
+  } else if (dest.includes('europe') || dest.includes('paris') || dest.includes('france') || dest.includes('italy') || dest.includes('spain') || dest.includes('germany') || dest.includes('rome') || dest.includes('barcelona') || dest.includes('amsterdam') || dest.includes('vienna') || dest.includes('prague') || dest.includes('berlin') || dest.includes('munich') || dest.includes('milan') || dest.includes('florence') || dest.includes('venice') || dest.includes('madrid') || dest.includes('lisbon') || dest.includes('athens') || dest.includes('greece') || dest.includes('portugal') || dest.includes('netherlands') || dest.includes('belgium') || dest.includes('brussels') || dest.includes('switzerland') || dest.includes('zurich') || dest.includes('austria') || dest.includes('ireland') || dest.includes('dublin')) {
     return { symbol: '€', mult: 0.9 };
-  } else if (dest.includes('dubai') || dest.includes('uae')) {
+  } else if (dest.includes('dubai') || dest.includes('uae') || dest.includes('abu dhabi') || dest.includes('sharjah')) {
     return { symbol: 'AED ', mult: 3.67 };
-  } else if (dest.includes('thailand') || dest.includes('bangkok')) {
+  } else if (dest.includes('thailand') || dest.includes('bangkok') || dest.includes('phuket') || dest.includes('chiang mai') || dest.includes('pattaya') || dest.includes('krabi')) {
     return { symbol: '฿', mult: 36 };
-  } else if (dest.includes('indonesia') || dest.includes('bali')) {
+  } else if (dest.includes('indonesia') || dest.includes('bali') || dest.includes('jakarta') || dest.includes('yogyakarta')) {
     return { symbol: 'Rp', mult: 16000 };
+  } else if (dest.includes('malaysia') || dest.includes('kuala lumpur') || dest.includes('penang') || dest.includes('langkawi')) {
+    return { symbol: 'RM', mult: 4.7 };
+  } else if (dest.includes('singapore')) {
+    return { symbol: 'S$', mult: 1.35 };
+  } else if (dest.includes('korea') || dest.includes('seoul') || dest.includes('busan') || dest.includes('jeju')) {
+    return { symbol: '₩', mult: 1350 };
+  } else if (dest.includes('australia') || dest.includes('sydney') || dest.includes('melbourne') || dest.includes('brisbane')) {
+    return { symbol: 'A$', mult: 1.55 };
+  } else if (dest.includes('canada') || dest.includes('toronto') || dest.includes('vancouver') || dest.includes('montreal')) {
+    return { symbol: 'C$', mult: 1.37 };
+  } else if (dest.includes('nepal') || dest.includes('kathmandu') || dest.includes('pokhara')) {
+    return { symbol: 'NPR ', mult: 133 };
+  } else if (dest.includes('sri lanka') || dest.includes('colombo') || dest.includes('kandy')) {
+    return { symbol: 'LKR ', mult: 320 };
+  } else if (dest.includes('vietnam') || dest.includes('hanoi') || dest.includes('ho chi minh') || dest.includes('saigon')) {
+    return { symbol: '₫', mult: 25000 };
+  } else if (dest.includes('turkey') || dest.includes('istanbul') || dest.includes('cappadocia') || dest.includes('ankara') || dest.includes('antalya')) {
+    return { symbol: '₺', mult: 32 };
+  } else if (dest.includes('egypt') || dest.includes('cairo') || dest.includes('luxor') || dest.includes('alexandria')) {
+    return { symbol: 'EGP ', mult: 50 };
+  } else if (dest.includes('usa') || dest.includes('united states') || dest.includes('new york') || dest.includes('los angeles') || dest.includes('san francisco') || dest.includes('las vegas') || dest.includes('miami') || dest.includes('chicago') || dest.includes('hawaii') || dest.includes('washington') || dest.includes('boston') || dest.includes('seattle') || dest.includes('america')) {
+    return { symbol: '$', mult: 1 };
   }
-  // Default to INR if it seems like an Indian IP or just standard fallback, but let's keep standard $ for others.
-  return { symbol: '$', mult: 1 };
+  // Default to INR for Indian user base
+  return { symbol: '₹', mult: 85 };
 }
 
 function getDemoItinerary(tripDetails) {
