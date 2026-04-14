@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import DayCard from './DayCard';
 import TravelTips from './TravelTips';
+import GettingThere from './GettingThere';
+import WeatherInfo from './WeatherInfo';
+import NearbyPlaces from './NearbyPlaces';
 import { submitRating } from '../utils/api';
 
 const CATEGORY_ICONS = {
@@ -20,9 +23,10 @@ export default function ItineraryView({ data, image, mode, onNewTrip }) {
   const [hasRated, setHasRated] = useState(false);
 
   return (
-    <section className="itinerary-section">
+  return (
+    <section className="itinerary-section" id="itinerary-content">
       <div className="container">
-        <button className="back-link" onClick={onNewTrip}>
+        <button className="back-link no-print" onClick={onNewTrip}>
           ← Plan Another Trip
         </button>
 
@@ -81,6 +85,18 @@ export default function ItineraryView({ data, image, mode, onNewTrip }) {
           </div>
         )}
 
+        {/* Weather Info */}
+        {itinerary.weather && (
+          <div style={{ marginTop: '32px' }}>
+            <WeatherInfo data={itinerary.weather} />
+          </div>
+        )}
+
+        {/* Getting There */}
+        {itinerary.gettingThere && (
+          <GettingThere data={itinerary.gettingThere} />
+        )}
+
         {/* Daily Timeline */}
         <div className="section-header" style={{ marginTop: '48px' }}>
           <div className="section-badge">📋 Day by Day</div>
@@ -98,13 +114,54 @@ export default function ItineraryView({ data, image, mode, onNewTrip }) {
           ))}
         </div>
 
-        {/* Travel Tips */}
-        {itinerary.travelTips && (
-          <TravelTips tips={itinerary.travelTips} />
+        {/* Nearby Places */}
+        {itinerary.nearbyPlaces && itinerary.nearbyPlaces.length > 0 && (
+          <NearbyPlaces places={itinerary.nearbyPlaces} />
         )}
 
+        {/* Travel Tips & Emergency Info */}
+        <div style={{ display: 'grid', gap: '32px', gridTemplateColumns: '1fr', marginTop: '48px' }}>
+          {itinerary.travelTips && (
+            <TravelTips tips={itinerary.travelTips} />
+          )}
+
+          {itinerary.emergencyInfo && (
+            <div style={{ padding: '24px', background: 'rgba(244, 63, 94, 0.05)', border: '1px solid rgba(244, 63, 94, 0.2)', borderRadius: 'var(--radius-lg)' }}>
+              <h3 style={{ color: '#f43f5e', fontSize: '1.2rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🚨</span> Emergency Contacts
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                {itinerary.emergencyInfo.police && (
+                  <div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Police</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{itinerary.emergencyInfo.police}</div>
+                  </div>
+                )}
+                {itinerary.emergencyInfo.ambulance && (
+                  <div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Ambulance/Medical</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{itinerary.emergencyInfo.ambulance}</div>
+                  </div>
+                )}
+                {itinerary.emergencyInfo.touristHelpline && (
+                  <div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Tourist Helpline</div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{itinerary.emergencyInfo.touristHelpline}</div>
+                  </div>
+                )}
+                {itinerary.emergencyInfo.nearestHospital && (
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Nearest Major Hospital</div>
+                    <div style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>{itinerary.emergencyInfo.nearestHospital}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Rating Section */}
-        <div style={{ marginTop: '48px', padding: '32px', background: 'var(--gradient-card)', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
+        <div className="no-print" style={{ marginTop: '48px', padding: '32px', background: 'var(--gradient-card)', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
           <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', marginBottom: '16px' }}>
             {hasRated ? 'Thank you for your feedback! 💖' : 'How would you rate this itinerary?'}
           </h3>
@@ -137,9 +194,17 @@ export default function ItineraryView({ data, image, mode, onNewTrip }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="actions-bar">
+        <div className="actions-bar no-print">
           <button className="btn-action primary" onClick={onNewTrip}>
             ✨ Plan New Trip
+          </button>
+          <button
+            className="btn-action"
+            onClick={() => {
+              window.print();
+            }}
+          >
+            🖨️ Print / Save PDF
           </button>
           <button
             className="btn-action"
@@ -154,7 +219,7 @@ export default function ItineraryView({ data, image, mode, onNewTrip }) {
               URL.revokeObjectURL(url);
             }}
           >
-            💾 Save Itinerary
+            💾 Export JSON
           </button>
           <button
             className="btn-action"

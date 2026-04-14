@@ -1,12 +1,13 @@
 function buildItineraryPrompt(tripDetails) {
-  const { destination, startDate, endDate, budget, interests, travelStyle, travelers } = tripDetails;
+  const { destination, origin, startDate, endDate, budget, interests, travelStyle, travelers } = tripDetails;
 
   const interestList = interests && interests.length > 0 ? interests.join(', ') : 'general sightseeing';
+  const originContext = origin ? `\n- Traveling From: ${origin}` : '';
 
   return `You are an expert LOCAL travel guide who has lived in ${destination} for 20 years. Generate a detailed, highly authentic travel itinerary based on the following preferences. Your recommendations must feel like insider knowledge from a real local — NOT generic tourist suggestions.
 
 TRIP DETAILS:
-- Destination: ${destination}
+- Destination: ${destination}${originContext}
 - Travel Dates: ${startDate} to ${endDate}
 - Budget Level: ${budget} (Budget = low-cost/backpacker, Mid-Range = comfortable/moderate, Luxury = premium/high-end)
 - Interests: ${interestList}
@@ -24,12 +25,26 @@ CRITICAL REQUIREMENTS:
 8. Add practical travel tips specific to this destination (real street food spots, local transport like auto-rickshaws, metros, tuk-tuks, etc.)
 9. Consider travel time between locations
 10. Include meal recommendations with REAL restaurant or food stall names famous in that area
+11. Estimated costs MUST vary realistically — a budget pilgrimage site should be very cheap, while a luxury metro city should be expensive. Do NOT use the same cost range for every destination.
+${origin ? `12. Include a "gettingThere" section with realistic transport options from ${origin} to ${destination} (train names, flight estimates, bus services, approximate durations and costs)` : ''}
 
 RESPOND WITH ONLY VALID JSON in this exact format (no markdown, no code blocks, just raw JSON):
 {
   "destination": "City, Country",
   "summary": "A brief 2-3 sentence overview of the trip",
   "highlights": ["highlight1", "highlight2", "highlight3", "highlight4", "highlight5"],
+  ${origin ? `"gettingThere": {
+    "fromCity": "${origin}",
+    "options": [
+      {
+        "mode": "Train/Flight/Bus",
+        "name": "Specific train name or airline",
+        "duration": "X hours",
+        "cost": "<local_currency_symbol><amount>"
+      }
+    ],
+    "recommended": "The best option for this trip"
+  },` : ''}
   "dailyItinerary": [
     {
       "day": 1,
@@ -48,6 +63,19 @@ RESPOND WITH ONLY VALID JSON in this exact format (no markdown, no code blocks, 
       ]
     }
   ],
+  "nearbyPlaces": [
+    {
+      "name": "Place Name",
+      "distance": "X km",
+      "description": "Brief description",
+      "suggestedTime": "Half day / Full day"
+    }
+  ],
+  "weather": {
+    "expected": "Weather description for the travel dates",
+    "temperature": "XX-XX°C",
+    "tip": "What to prepare for"
+  },
   "travelTips": {
     "packing": ["item1", "item2", "item3", "item4", "item5"],
     "customs": ["tip1", "tip2", "tip3"],
@@ -55,6 +83,12 @@ RESPOND WITH ONLY VALID JSON in this exact format (no markdown, no code blocks, 
     "safety": ["tip1", "tip2", "tip3"],
     "transportation": ["tip1", "tip2", "tip3"],
     "bestTimeToVisit": "Description of best time to visit"
+  },
+  "emergencyInfo": {
+    "police": "Emergency number",
+    "ambulance": "Emergency number",
+    "touristHelpline": "Helpline number if available",
+    "nearestHospital": "Name and location of nearest major hospital"
   },
   "estimatedTotalCost": {
     "accommodation": "<local_currency_symbol><amount> - <local_currency_symbol><amount>",
@@ -70,6 +104,7 @@ const CHATBOT_SYSTEM_PROMPT = `
 You are TravelBot, an energetic and highly knowledgeable expert travel assistant working for TravelAI.
 Your goal is to help users plan trips, offer suggestions for activities, hotels, and flights, and answer any general travel-related questions they might have.
 Always maintain a friendly, engaging, and professional tone. Keep your answers concise, well-formatted, and easy to read.
+Use bullet points and bold text for key information. When suggesting places, always use REAL names of actual restaurants, hotels, and landmarks.
 If a user asks about something entirely unrelated to travel (like coding, math, or history outside of a tourist perspective), politely steer the conversation back to travel and vacation planning.
 `;
 

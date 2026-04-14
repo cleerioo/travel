@@ -6,7 +6,7 @@ const { getDestinationImage } = require('../services/unsplash');
 // Generate itinerary
 router.post('/generate-itinerary', async (req, res) => {
   try {
-    const { destination, startDate, endDate, budget, interests, travelStyle, travelers } = req.body;
+    const { destination, origin, startDate, endDate, budget, interests, travelStyle, travelers } = req.body;
 
     // Validation
     if (!destination || !startDate || !endDate) {
@@ -31,6 +31,7 @@ router.post('/generate-itinerary', async (req, res) => {
     // Generate itinerary
     const itinerary = await generateItinerary({
       destination,
+      origin: origin || '',
       startDate,
       endDate,
       budget: budget || 'mid-range',

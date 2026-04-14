@@ -45,6 +45,16 @@ export default function ChatBot() {
     }
   };
 
+  const renderMarkdown = (text) => {
+    if (!text) return null;
+    let html = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br />');
+
+    return <span dangerouslySetInnerHTML={{ __html: html }} />;
+  };
+
   return (
     <>
       {/* Floating Action Button */}
@@ -69,7 +79,7 @@ export default function ChatBot() {
           {messages.map((msg, index) => (
             <div key={index} className={`chatbot-message ${msg.role}`}>
               <div className="chatbot-bubble">
-                {msg.text}
+                {msg.role === 'ai' ? renderMarkdown(msg.text) : msg.text}
               </div>
             </div>
           ))}

@@ -14,26 +14,63 @@ const INTERESTS = [
 ];
 
 const POPULAR_DESTINATIONS = [
-  'Tokyo, Japan',
-  'Paris, France',
-  'Bali, Indonesia',
-  'Rome, Italy',
-  'Barcelona, Spain',
-  'Dubai, UAE',
-  'New York, USA',
-  'London, UK',
-  'Sydney, Australia',
-  'Santorini, Greece',
-  'Bangkok, Thailand',
-  'Istanbul, Turkey',
+  'Varanasi, India',
+  'Vaishno Devi, India',
   'Goa, India',
   'Jaipur, India',
+  'Delhi, India',
+  'Agra, India',
+  'Shimla, India',
+  'Manali, India',
+  'Rishikesh, India',
+  'Amritsar, India',
   'Kerala, India',
+  'Udaipur, India',
+  'Darjeeling, India',
+  'Ooty, India',
+  'Andaman Islands, India',
+  'Ladakh, India',
+  'Mumbai, India',
+  'Tirupati, India',
+  'Haridwar, India',
+  'Pondicherry, India',
+  'Dubai, UAE',
+  'Bangkok, Thailand',
+  'Paris, France',
+  'Tokyo, Japan',
+  'Bali, Indonesia',
+  'Singapore',
+  'London, UK',
+  'Istanbul, Turkey',
+];
+
+const POPULAR_ORIGINS = [
+  'Delhi',
+  'Mumbai',
+  'Bangalore',
+  'Chennai',
+  'Kolkata',
+  'Hyderabad',
+  'Pune',
+  'Ahmedabad',
+  'Jaipur',
+  'Lucknow',
+  'Chandigarh',
+  'Patna',
+  'Ranchi',
+  'Bhopal',
+  'Indore',
+  'Varanasi',
+  'Kochi',
+  'Guwahati',
+  'Dehradun',
+  'Nagpur',
 ];
 
 export default function TripForm({ onSubmit, isLoading }) {
   const [formData, setFormData] = useState({
     destination: '',
+    origin: '',
     startDate: '',
     endDate: '',
     budget: 'mid-range',
@@ -44,9 +81,14 @@ export default function TripForm({ onSubmit, isLoading }) {
 
   const [errors, setErrors] = useState({});
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
 
   const filteredSuggestions = POPULAR_DESTINATIONS.filter(d =>
     d.toLowerCase().includes(formData.destination.toLowerCase()) && formData.destination.length > 0
+  );
+
+  const filteredOriginSuggestions = POPULAR_ORIGINS.filter(d =>
+    d.toLowerCase().includes(formData.origin.toLowerCase()) && formData.origin.length > 0
   );
 
   const handleChange = (field, value) => {
@@ -103,14 +145,68 @@ export default function TripForm({ onSubmit, isLoading }) {
           <p className="form-subtitle">Tell us about your ideal adventure and let AI create the perfect itinerary.</p>
 
           <div className="form-grid">
+            {/* Traveling From */}
+            <div className="form-group" style={{ position: 'relative' }}>
+              <label className="form-label">🚉 Traveling From</label>
+              <input
+                id="origin-input"
+                type="text"
+                className="form-input"
+                placeholder="Your city (e.g., Delhi)"
+                value={formData.origin}
+                onChange={(e) => {
+                  handleChange('origin', e.target.value);
+                  setShowOriginSuggestions(true);
+                }}
+                onFocus={() => setShowOriginSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowOriginSuggestions(false), 200)}
+              />
+              {showOriginSuggestions && filteredOriginSuggestions.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  background: '#1a2235',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '12px',
+                  zIndex: 50,
+                  overflow: 'hidden',
+                  marginTop: '4px',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                }}>
+                  {filteredOriginSuggestions.slice(0, 5).map((city, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        padding: '12px 18px',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                        borderBottom: i < Math.min(filteredOriginSuggestions.length, 5) - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                        transition: 'background 0.15s',
+                      }}
+                      onMouseDown={() => {
+                        handleChange('origin', city);
+                        setShowOriginSuggestions(false);
+                      }}
+                      onMouseEnter={(e) => e.target.style.background = 'rgba(249,115,22,0.1)'}
+                      onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                    >
+                      🚉 {city}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Destination */}
-            <div className="form-group full-width" style={{ position: 'relative' }}>
-              <label className="form-label">📍 Destination</label>
+            <div className="form-group" style={{ position: 'relative' }}>
+              <label className="form-label">📍 Going To</label>
               <input
                 id="destination-input"
                 type="text"
                 className="form-input"
-                placeholder="Where do you want to go? (e.g., Tokyo, Japan)"
+                placeholder="Where do you want to go?"
                 value={formData.destination}
                 onChange={(e) => {
                   handleChange('destination', e.target.value);

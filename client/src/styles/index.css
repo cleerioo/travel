@@ -1783,3 +1783,114 @@ input, select, textarea {
     height: 400px;
   }
 }
+
+/* ============================
+   PRINT STYLES
+   ============================ */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  /* Hide UI elements */
+  .header, .footer, .chatbot-toggle, .chatbot-window, .no-print, .actions-bar {
+    display: none !important;
+  }
+
+  /* Adjust section for printing */
+  .itinerary-section {
+    padding: 0;
+  }
+  
+  .itinerary-hero {
+    height: auto;
+    border-radius: 0;
+    margin-bottom: 24px;
+    position: relative;
+    page-break-after: avoid;
+  }
+  
+  .itinerary-hero-image {
+    display: none;
+  }
+  
+  .itinerary-hero-overlay {
+    position: relative;
+    background: white;
+    padding: 0;
+    color: black;
+  }
+  
+  .itinerary-destination {
+    color: black;
+    font-size: 24pt;
+    margin-bottom: 8pt;
+  }
+  
+  .itinerary-summary {
+    color: #333;
+    font-size: 12pt;
+    font-weight: normal;
+  }
+  
+  .itinerary-meta-item, .highlight-pill, .cost-item {
+    background: transparent;
+    border: 1px solid #ccc;
+    color: black;
+    border-radius: 4px;
+    padding: 4pt 8pt;
+  }
+
+  .timeline {
+    border-left: 2px solid #ccc;
+  }
+  
+  .day-card {
+    background: transparent;
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+    box-shadow: none;
+  }
+
+  .day-card.open {
+    border-color: #000;
+  }
+
+  .day-header {
+    background: transparent;
+    border-bottom: 1px solid #ccc;
+    color: black;
+  }
+
+  .day-title {
+    color: black;
+  }
+
+  .activity-card {
+    background: transparent;
+    border: 1px solid #ddd;
+    page-break-inside: avoid;
+  }
+  
+  .activity-title {
+    color: black;
+  }
+  
+  .activity-cost {
+    background: transparent;
+    color: black;
+    border: 1px solid #ccc;
+  }
+
+  .section-title {
+    color: black;
+    page-break-after: avoid;
+  }
+
+  /* Backgrounds removal for print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
