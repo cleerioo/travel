@@ -23,7 +23,6 @@ export default function ItineraryView({ data, image, mode, onNewTrip }) {
   const [hasRated, setHasRated] = useState(false);
 
   return (
-  return (
     <section className="itinerary-section" id="itinerary-content">
       <div className="container">
         <button className="back-link no-print" onClick={onNewTrip}>
