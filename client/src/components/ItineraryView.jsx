@@ -5,6 +5,7 @@ import GettingThere from './GettingThere';
 import WeatherInfo from './WeatherInfo';
 import NearbyPlaces from './NearbyPlaces';
 import { submitRating } from '../utils/api';
+import { downloadICS } from '../utils/calendar';
 
 const CATEGORY_ICONS = {
   culture: '🏛️',
@@ -204,6 +205,12 @@ export default function ItineraryView({ data, image, mode, onNewTrip }) {
             }}
           >
             🖨️ Print / Save PDF
+          </button>
+          <button
+            className="btn-action"
+            onClick={() => downloadICS(itinerary)}
+          >
+            📅 Add to Calendar
           </button>
           <button
             className="btn-action"

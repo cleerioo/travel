@@ -55,7 +55,18 @@ export default function DayCard({ day, defaultOpen = false }) {
                   {CATEGORY_ICONS[activity.category] || '📌'}
                 </div>
                 <div className="activity-details">
-                  <div className="activity-name">{activity.name}</div>
+                  <div className="activity-name" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    {activity.name}
+                    <a 
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(activity.location ? `${activity.name}, ${activity.location}` : activity.name)}`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="no-print"
+                      style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', textDecoration: 'none', background: 'rgba(249, 115, 22, 0.1)', padding: '4px 10px', borderRadius: '12px', border: '1px solid rgba(249, 115, 22, 0.2)', transition: 'var(--transition-fast)' }}
+                    >
+                      📍 View Map
+                    </a>
+                  </div>
                   <div className="activity-desc">{activity.description}</div>
                   <div className="activity-meta">
                     <span className="activity-tag">
