@@ -249,7 +249,6 @@ function getDemoItinerary(tripDetails) {
 
   return demoItinerary;
 }
-}
 
 const { CHATBOT_SYSTEM_PROMPT } = require('../utils/prompts');
 
